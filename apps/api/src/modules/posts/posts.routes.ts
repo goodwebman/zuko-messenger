@@ -8,13 +8,14 @@ import {
   type Paginated,
   type Post as PostDTO,
 } from '@zuko/contracts';
-import { authenticate } from '../../lib/auth';
+import { authenticate, optionalAuthenticate } from '../../lib/auth';
 import { forbidden, notFound } from '../../lib/errors';
 import { createNotification } from '../notifications/notifications.service';
 import { postInclude, toPost } from './posts.service';
 
-export async function postsRoutes(app: FastifyInstance): Promise<void> {
-  app.addHook('preHandler', authenticate);
+/** Чтение ленты и постов — публично (гость видит контент, но не может писать). */
+async function publicPostsRoutes(app: FastifyInstance): Promise<void> {
+  app.addHook('preHandler', optionalAuthenticate);
 
   // Лента (курсорная пагинация). authorId → посты конкретного юзера (профиль).
   app.get('/posts', async (req): Promise<Paginated<PostDTO>> => {
@@ -22,7 +23,7 @@ export async function postsRoutes(app: FastifyInstance): Promise<void> {
 
     const rows = await prisma.post.findMany({
       where: authorId ? { authorId } : undefined,
-      include: postInclude(req.userId),
+      include: postInclude(req.viewerId),
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
@@ -38,10 +39,18 @@ export async function postsRoutes(app: FastifyInstance): Promise<void> {
 
   app.get('/posts/:id', async (req): Promise<PostDTO> => {
     const { id } = req.params as { id: string };
-    const post = await prisma.post.findUnique({ where: { id }, include: postInclude(req.userId) });
+    const post = await prisma.post.findUnique({
+      where: { id },
+      include: postInclude(req.viewerId),
+    });
     if (!post) throw notFound('Пост не найден');
     return toPost(post);
   });
+}
+
+/** Всё, что меняет данные, — только для авторизованных. */
+async function protectedPostsRoutes(app: FastifyInstance): Promise<void> {
+  app.addHook('preHandler', authenticate);
 
   app.post('/posts', async (req, reply) => {
     const { body, images } = createPostSchema.parse(req.body);
@@ -126,4 +135,10 @@ export async function postsRoutes(app: FastifyInstance): Promise<void> {
     });
     return reply.code(201).send(toPost(post));
   });
+}
+
+export async function postsRoutes(app: FastifyInstance): Promise<void> {
+  // Отдельные scope'ы: preHandler-хук инкапсулирован в своём плагине и не течёт наружу.
+  await app.register(publicPostsRoutes);
+  await app.register(protectedPostsRoutes);
 }

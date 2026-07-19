@@ -2,12 +2,17 @@ import { Prisma } from '@zuko/db';
 import type { Post as PostDTO } from '@zuko/contracts';
 import { toUserPublic } from '../../lib/serializers';
 
-/** Include для поста: автор, агрегаты, лайк текущего юзера, оригинал (для репоста). */
-export function postInclude(meId: string) {
+/**
+ * Include для поста: автор, агрегаты, лайк текущего юзера, оригинал (для репоста).
+ * @param meId id читателя; `undefined` — гость, тогда `likedByMe` всегда false.
+ */
+export function postInclude(meId?: string) {
   const likeAndCounts = {
     author: true,
     _count: { select: { likes: true, comments: true, reposts: true } },
-    likes: { where: { userId: meId }, select: { id: true } },
+    // NB: `userId: undefined` Prisma трактует как «не фильтровать» и вернул бы все
+    // лайки — поэтому для гостя подставляем заведомо несуществующий id.
+    likes: { where: { userId: meId ?? '' }, select: { id: true } },
   } satisfies Prisma.PostInclude;
 
   return {

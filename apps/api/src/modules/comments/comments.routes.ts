@@ -7,8 +7,7 @@ import { toComment } from '../../lib/serializers';
 import { createNotification } from '../notifications/notifications.service';
 
 export async function commentsRoutes(app: FastifyInstance): Promise<void> {
-  app.addHook('preHandler', authenticate);
-
+  // Читать комментарии может кто угодно — токен здесь не нужен даже опционально.
   app.get('/posts/:id/comments', async (req): Promise<CommentDTO[]> => {
     const { id } = req.params as { id: string };
     const comments = await prisma.comment.findMany({
@@ -19,6 +18,13 @@ export async function commentsRoutes(app: FastifyInstance): Promise<void> {
     return comments.map(toComment);
   });
 
+  await app.register(async (write) => {
+    write.addHook('preHandler', authenticate);
+    writeCommentRoutes(write);
+  });
+}
+
+function writeCommentRoutes(app: FastifyInstance): void {
   app.post('/posts/:id/comments', async (req, reply) => {
     const { id } = req.params as { id: string };
     const { body } = createCommentSchema.parse(req.body);
