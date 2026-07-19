@@ -1,7 +1,7 @@
 'use client';
 
 import { NotificationItem, useNotificationsSuspense } from '@/entities/notification';
-import { EmptyState } from '@/shared/ui';
+import { EmptyState } from '@zuko/ui/app';
 
 export function NotificationsList() {
   const { data } = useNotificationsSuspense();

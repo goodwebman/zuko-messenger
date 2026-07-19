@@ -3,7 +3,7 @@
 import { UIButton } from '@zuko/ui';
 import { useFeed } from '@/entities/post';
 import { PostCardConnected } from '@/widgets/post-card';
-import { EmptyState } from '@/shared/ui';
+import { EmptyState } from '@zuko/ui/app';
 
 export function Feed({ authorId }: { authorId?: string }) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useFeed(authorId);

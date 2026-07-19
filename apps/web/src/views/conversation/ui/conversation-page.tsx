@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useParams } from 'next/navigation';
 import { Chat } from '@/widgets/chat';
-import { ChatSkeleton, ErrorBoundary } from '@/shared/ui';
+import { ChatSkeleton, ErrorBoundary } from '@zuko/ui/app';
 
 export function ConversationPage() {
   const { conversationId } = useParams<{ conversationId: string }>();

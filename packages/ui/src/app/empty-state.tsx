@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { BrandMark } from './brand-logo';
 
 export function EmptyState({ title, hint }: { title: string; hint?: ReactNode }) {
   return (
@@ -6,12 +7,10 @@ export function EmptyState({ title, hint }: { title: string; hint?: ReactNode })
       <div className="relative mb-1 flex size-14 items-center justify-center">
         {/* Мягкое lime-свечение за марком — глубина без плоского фона. */}
         <span aria-hidden className="absolute inset-0 rounded-full bg-signal-lime/10 blur-xl" />
-        <span aria-hidden className="animate-mark text-3xl text-signal-lime">
-          ◤
-        </span>
+        <BrandMark className="size-10 opacity-80" />
       </div>
-      <p className="text-cloud-text">{title}</p>
-      {hint && <p className="text-sm text-fog-text">{hint}</p>}
+      <p className="text-lg text-cloud-text">{title}</p>
+      {hint && <p className="text-base text-fog-text">{hint}</p>}
     </div>
   );
 }

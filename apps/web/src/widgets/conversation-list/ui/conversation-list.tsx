@@ -7,7 +7,7 @@ import {
   selectUnread,
   useConversationsSuspense,
 } from '@/entities/conversation';
-import { EmptyState } from '@/shared/ui';
+import { EmptyState } from '@zuko/ui/app';
 import { useAppSelector } from '@/shared/lib';
 
 function ConversationRow({ conversation }: { conversation: Conversation }) {

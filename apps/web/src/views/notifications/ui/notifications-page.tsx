@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { NotificationsList } from '@/widgets/notifications-list';
 import { MarkAllReadButton } from '@/features/mark-notifications-read';
-import { ErrorBoundary, NotificationsSkeleton, PageHeader } from '@/shared/ui';
+import { ErrorBoundary, NotificationsSkeleton, PageHeader } from '@zuko/ui/app';
 
 export function NotificationsPage() {
   return (

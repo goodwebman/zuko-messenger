@@ -1,9 +1,9 @@
-import { UISkeleton } from '@zuko/ui';
+import { UISkeleton } from '../components';
 
 function Row() {
   return (
     <div className="flex gap-3 border-b border-steel-border px-4 py-4">
-      <UISkeleton className="size-9 shrink-0 rounded-full" />
+      <UISkeleton className="size-11 shrink-0 rounded-full" />
       <div className="flex-1 space-y-2">
         <UISkeleton className="h-3 w-32" />
         <UISkeleton className="h-3 w-full" />
@@ -38,7 +38,7 @@ export function ConversationsSkeleton() {
     <div aria-hidden>
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 border-b border-steel-border px-4 py-3">
-          <UISkeleton className="size-9 rounded-full" />
+          <UISkeleton className="size-11 rounded-full" />
           <div className="flex-1 space-y-2">
             <UISkeleton className="h-3 w-28" />
             <UISkeleton className="h-3 w-40" />

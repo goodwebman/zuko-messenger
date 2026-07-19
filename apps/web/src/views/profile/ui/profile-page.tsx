@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useUserSuspense } from '@/entities/user';
 import { ProfileHeader } from '@/widgets/profile-header';
 import { Feed } from '@/widgets/feed';
-import { ErrorBoundary, FeedSkeleton, PageHeader, ProfileSkeleton } from '@/shared/ui';
+import { ErrorBoundary, FeedSkeleton, PageHeader, ProfileSkeleton } from '@zuko/ui/app';
 
 function ProfileContent({ username }: { username: string }) {
   const { data: user } = useUserSuspense(username);

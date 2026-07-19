@@ -8,6 +8,12 @@
   ],
   "exports": {
     ".": "./src/index.ts",
+    "./app": "./src/app/index.ts",
+    "./app/styles.css": "./src/app/styles.css",
+    "./app/*": [
+      "./src/app/*.tsx",
+      "./src/app/*.ts"
+    ],
     "./styles.css": "./src/styles/tokens.css"
   },
   "scripts": {

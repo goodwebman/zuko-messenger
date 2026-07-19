@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useParams } from 'next/navigation';
 import { PostDetail } from '@/widgets/post-detail';
-import { ErrorBoundary, FeedSkeleton, PageHeader } from '@/shared/ui';
+import { ErrorBoundary, FeedSkeleton, PageHeader } from '@zuko/ui/app';
 
 export function PostPage() {
   const { id } = useParams<{ id: string }>();

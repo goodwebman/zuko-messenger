@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 import { ConversationList } from '@/widgets/conversation-list';
-import { ConversationsSkeleton, ErrorBoundary, PageHeader } from '@/shared/ui';
+import { ConversationsSkeleton, ErrorBoundary, PageHeader } from '@zuko/ui/app';
 
 export function MessagesPage() {
   return (

@@ -1,11 +1,18 @@
 'use client';
 
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { UIButton } from '@zuko/ui';
+import { UIButton } from '../components';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
+  /**
+   * Куда сообщить о пойманной ошибке (Sentry, лог, тост). По умолчанию —
+   * `console.error`. Вынесено в проп, потому что kit не знает про окружение
+   * потребителя: `process.env.NODE_ENV` здесь недоступен и завязка на него
+   * привязала бы пакет к конкретному сборщику.
+   */
+  onError?: (error: Error, info: ErrorInfo) => void;
 }
 
 interface ErrorBoundaryState {
@@ -21,9 +28,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('ErrorBoundary:', error, info.componentStack);
+    const { onError } = this.props;
+    if (onError) {
+      onError(error, info);
+      return;
     }
+    console.error('ErrorBoundary:', error, info.componentStack);
   }
 
   private readonly reset = (): void => {

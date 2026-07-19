@@ -9,7 +9,7 @@ export default function GlobalError({ reset }: { error: Error; reset: () => void
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#1c1e21',
+          background: '#121317',
           color: '#e5e7eb',
           fontFamily: 'system-ui, sans-serif',
         }}

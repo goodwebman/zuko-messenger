@@ -2,7 +2,7 @@
 
 import { selectCurrentUser } from '@/entities/session';
 import { ProfileForm } from '@/features/update-profile';
-import { PageHeader } from '@/shared/ui';
+import { PageHeader } from '@zuko/ui/app';
 import { useAppSelector } from '@/shared/lib';
 
 export function SettingsPage() {

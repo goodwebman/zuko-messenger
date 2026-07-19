@@ -1,5 +1,7 @@
 /* Единая точка стилей. tokens.css приносит tailwind + @theme (Trigger.dev). */
 @import '@zuko/ui/styles.css';
+/* Прикладной слой кита: CSS, существующий ради zuko (кейфреймы, правки Preflight). */
+@import '@zuko/ui/app/styles.css';
 
 /* Tailwind не сканирует node_modules автоматически — указываем исходники ui-kit явно. */
 @source '../../../../packages/ui/src';
