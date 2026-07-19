@@ -22,8 +22,7 @@
     "db:studio": "npm run studio --workspace @zuko/db",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
-    "ui:sync": "node scripts/sync-ui-kit.mjs"
+    "test": "npm run test --workspaces --if-present"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",

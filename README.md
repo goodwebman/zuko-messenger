@@ -85,7 +85,21 @@ npm run dev
 | `npm run typecheck` | tsc по всем workspaces |
 | `npm run test` | Vitest по всем workspaces |
 | `npm run db:push` / `db:migrate` / `db:seed` / `db:studio` | Prisma |
-| `npm run ui:sync` | пересинхронизировать компоненты `@zuko/ui` из апстрим-репозитория |
+
+### UI-кит
+
+`packages/ui` — обычный workspace-пакет и первоисточник, а не вендоринг: npm
+линкует `node_modules/@zuko/ui` junction'ом на папку пакета, `transpilePackages`
+в `next.config.ts` отдаёт его Next как TS-исходники, а Tailwind сканирует классы
+через `@source '../../../../packages/ui/src'` в `globals.css`.
+
+Итог: правка в `packages/ui` подхватывается работающим `next dev` сразу —
+и webpack пересобирает модуль, и Tailwind перегенерирует CSS. Никакой команды
+синхронизации не нужно.
+
+Структура: `src/components` + `src/lib` + `src/icons` — универсальные примитивы
+(`@zuko/ui`), `src/app` — сборки под этот продукт (`@zuko/ui/app`), туда же
+`src/app/styles.css` для zuko-специфичного CSS.
 
 ## Как это работает
 
