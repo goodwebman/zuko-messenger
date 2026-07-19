@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: zuko-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: zuko
+      POSTGRES_PASSWORD: zuko
+      POSTGRES_DB: zuko
+    ports:
+      - "5432:5432"
+    volumes:
+      - zuko-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zuko -d zuko"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Опционально: лёгкий UI для БД на http://localhost:8080
+  adminer:
+    image: adminer:4
+    container_name: zuko-adminer
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+volumes:
+  zuko-pgdata:

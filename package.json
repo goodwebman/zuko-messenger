@@ -1,0 +1,38 @@
+{
+  "name": "zuko-messenger",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zuko Messenger — mini social network / Telegram-like messenger monorepo",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "concurrently -n api,web -c green,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "npm run dev --workspace @zuko/api",
+    "dev:web": "npm run dev --workspace @zuko/web",
+    "build": "npm run build --workspace @zuko/contracts && npm run build --workspace @zuko/ui && npm run build --workspace @zuko/api && npm run build --workspace @zuko/web",
+    "db:generate": "npm run generate --workspace @zuko/db",
+    "db:push": "npm run push --workspace @zuko/db",
+    "db:migrate": "npm run migrate --workspace @zuko/db",
+    "db:seed": "npm run seed --workspace @zuko/db",
+    "db:studio": "npm run studio --workspace @zuko/db",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "ui:sync": "node scripts/sync-ui-kit.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.7.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "prisma@6.19.3": true
+  }
+}
