@@ -82,7 +82,7 @@ export function AvatarPicker({
           )}
         </div>
         <p className="mt-2 text-sm text-fog-text">
-          JPG или PNG, до {MAX_UPLOAD_MB} МБ — перед сохранением можно кадрировать
+          JPG или PNG, до {MAX_UPLOAD_MB} МБ — кадрируйте и фото сохранится сразу
         </p>
       </div>
 
