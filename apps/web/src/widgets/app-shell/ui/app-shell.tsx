@@ -77,19 +77,19 @@ function MobileNav({ items, pathname }: { items: NavItem[]; pathname: string }) 
             aria-current={active ? 'page' : undefined}
             aria-label={item.label}
             className={cn(
-              'press relative flex flex-1 flex-col items-center gap-1 py-3 text-xs',
+              'press relative flex min-w-0 flex-1 flex-col items-center gap-1 px-0.5 py-2.5 text-[10px] leading-tight',
               active ? 'text-signal-lime' : 'text-fog-text',
             )}
           >
             <span className="relative">
-              <ItemIcon className="size-7" />
+              <ItemIcon className="size-6" />
               {item.badge ? (
-                <span className="absolute -right-2 -top-1 flex h-5 min-w-5 animate-pop items-center justify-center rounded-full bg-signal-lime px-1 text-[11px] font-semibold text-ink-well">
+                <span className="absolute -right-2 -top-1 flex h-4 min-w-4 animate-pop items-center justify-center rounded-full bg-signal-lime px-1 text-[10px] font-semibold text-ink-well">
                   {item.badge > 99 ? '99+' : item.badge}
                 </span>
               ) : null}
             </span>
-            <span>{item.label}</span>
+            <span className="max-w-full truncate">{item.label}</span>
           </Link>
         );
       })}
