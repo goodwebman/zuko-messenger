@@ -1,0 +1,36 @@
+/* Единая точка стилей. tokens.css приносит tailwind + @theme (Trigger.dev). */
+@import '@zuko/ui/styles.css';
+
+/* Tailwind не сканирует node_modules автоматически — указываем исходники ui-kit явно. */
+@source '../../../../packages/ui/src';
+
+/* Шрифтовые токены (font-geist / font-satoshi / …) объявлены в @zuko/ui tokens.css
+   и биндятся к next/font-переменным из layout.tsx. */
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Тонкий скроллбар в тёмной теме. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-steel-border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-steel-border);
+  border-radius: 9999px;
+}
+
+::selection {
+  background: var(--color-signal-lime);
+  color: var(--color-ink-well);
+}
