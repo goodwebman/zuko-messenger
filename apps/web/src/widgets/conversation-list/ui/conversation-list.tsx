@@ -4,19 +4,18 @@ import type { Conversation } from '@zuko/contracts';
 import {
   ConversationItem,
   selectPresence,
-  selectUnread,
   useConversationsSuspense,
 } from '@/entities/conversation';
 import { EmptyState } from '@zuko/ui/app';
 import { useAppSelector } from '@/shared/lib';
 
 function ConversationRow({ conversation }: { conversation: Conversation }) {
-  const unread = useAppSelector(selectUnread(conversation.id));
+  // unreadCount — из кэша conversations (единый источник), realtime патчит его на месте.
   const online = useAppSelector(selectPresence(conversation.peer.id));
   return (
     <ConversationItem
       conversation={conversation}
-      unreadCount={unread || conversation.unreadCount}
+      unreadCount={conversation.unreadCount}
       online={online}
     />
   );

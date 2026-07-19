@@ -1,25 +1,28 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@zuko/ui';
-import type { Message, Notification } from '@zuko/contracts';
 import { disconnectSocket, getSocket } from '@/shared/socket';
-import { queryKeys } from '@/shared/config';
 import { useAppDispatch, useAppSelector } from '@/shared/lib';
 import { selectCurrentUser } from '@/entities/session';
-import { incrementUnread, setConnected, setPresence, setTyping } from '@/entities/conversation';
-import { notificationToast } from '@/entities/notification';
+import { selectActiveConversation, setConnected } from '@/entities/conversation';
+import { createRealtimeHandlers } from './create-realtime-handlers';
 
 /**
- * Владеет жизненным циклом сокета: подключается после появления сессии,
- * маршрутизирует realtime-события в TanStack Query (данные) и стор (UI-состояние).
+ * Владеет жизненным циклом сокета: подключается после появления сессии, биндит/отвязывает
+ * слушатели. Вся маршрутизация событий — в createRealtimeHandlers (тестируется отдельно).
  */
 export function SocketProvider({ children }: { children: ReactNode }) {
   const userId = useAppSelector(selectCurrentUser)?.id;
+  const activeConversationId = useAppSelector(selectActiveConversation);
   const dispatch = useAppDispatch();
   const qc = useQueryClient();
   const { addToast } = useToast();
+
+  // Активный диалог читаем через ref — чтобы не пересоздавать слушатели при каждом открытии чата.
+  const activeRef = useRef(activeConversationId);
+  activeRef.current = activeConversationId;
 
   useEffect(() => {
     if (!userId) return;
@@ -27,42 +30,30 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     const socket = getSocket();
     socket.connect();
 
-    const onConnect = () => dispatch(setConnected(true));
-    const onDisconnect = () => dispatch(setConnected(false));
+    const h = createRealtimeHandlers({
+      qc,
+      dispatch,
+      toast: addToast,
+      currentUserId: userId,
+      getActiveConversationId: () => activeRef.current,
+    });
 
-    const onMessageNew = (message: Message) => {
-      void qc.invalidateQueries({ queryKey: queryKeys.messages(message.conversationId) });
-      void qc.invalidateQueries({ queryKey: queryKeys.conversations });
-    };
-
-    const onNotificationNew = (n: Notification) => {
-      void qc.invalidateQueries({ queryKey: queryKeys.notifications });
-      if (n.type === 'MESSAGE' && n.conversationId) dispatch(incrementUnread(n.conversationId));
-      addToast(notificationToast(n), 'default');
-    };
-
-    const onTyping = (p: { conversationId: string; userId: string; typing: boolean }) =>
-      dispatch(setTyping(p));
-    const onPresence = (p: { userId: string; online: boolean }) => dispatch(setPresence(p));
-    const onMessageRead = (p: { conversationId: string }) =>
-      void qc.invalidateQueries({ queryKey: queryKeys.messages(p.conversationId) });
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.on('message:new', onMessageNew);
-    socket.on('notification:new', onNotificationNew);
-    socket.on('typing', onTyping);
-    socket.on('presence:update', onPresence);
-    socket.on('message:read', onMessageRead);
+    socket.on('connect', h.onConnect);
+    socket.on('disconnect', h.onDisconnect);
+    socket.on('message:new', h.onMessageNew);
+    socket.on('notification:new', h.onNotificationNew);
+    socket.on('typing', h.onTyping);
+    socket.on('presence:update', h.onPresence);
+    socket.on('message:read', h.onMessageRead);
 
     return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.off('message:new', onMessageNew);
-      socket.off('notification:new', onNotificationNew);
-      socket.off('typing', onTyping);
-      socket.off('presence:update', onPresence);
-      socket.off('message:read', onMessageRead);
+      socket.off('connect', h.onConnect);
+      socket.off('disconnect', h.onDisconnect);
+      socket.off('message:new', h.onMessageNew);
+      socket.off('notification:new', h.onNotificationNew);
+      socket.off('typing', h.onTyping);
+      socket.off('presence:update', h.onPresence);
+      socket.off('message:read', h.onMessageRead);
       disconnectSocket();
       dispatch(setConnected(false));
     };

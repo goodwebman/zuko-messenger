@@ -22,7 +22,11 @@ export async function generateMetadata({
     return {
       title: `${post.author.displayName}: ${snippet}`,
       description: snippet,
-      openGraph: { title: `Пост от ${post.author.displayName}`, description: snippet },
+      openGraph: {
+        type: 'article',
+        title: `Пост от ${post.author.displayName}`,
+        description: snippet,
+      },
     };
   } catch {
     return { title: 'Пост' };

@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import Link from 'next/link';
 import type { Post } from '@zuko/contracts';
 import { PostCard } from '@/entities/post';
@@ -25,8 +26,12 @@ function CommentLink({ post }: { post: Post }) {
   );
 }
 
-/** Карточка поста с интерактивом — композиция entity PostCard и features. */
-export function PostCardConnected({ post }: { post: Post }) {
+/**
+ * Карточка поста с интерактивом — композиция entity PostCard и features.
+ * memo: при точечном патче ленты (patchPost) меняется ссылка только у затронутого поста —
+ * остальные карточки не перерисовываются.
+ */
+export const PostCardConnected = memo(function PostCardConnected({ post }: { post: Post }) {
   const me = useAppSelector(selectCurrentUser);
   const isOwn = me?.id === post.author.id;
 
@@ -44,4 +49,4 @@ export function PostCardConnected({ post }: { post: Post }) {
       }
     />
   );
-}
+});

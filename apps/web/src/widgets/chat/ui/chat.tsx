@@ -36,10 +36,17 @@ export function Chat({ conversationId }: { conversationId: string }) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [showJump, setShowJump] = useState(false);
 
-  const lastId = messages.at(-1)?.id;
+  const lastMessage = messages.at(-1);
+  const lastId = lastMessage?.id;
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [lastId, peerTyping]);
+
+  // Пришло сообщение от собеседника в открытый диалог — сразу отмечаем прочитанным,
+  // чтобы серверный unread не расходился с обнулённым бейджом.
+  useEffect(() => {
+    if (lastMessage && lastMessage.sender.id !== me?.id) socket.markRead();
+  }, [lastId, lastMessage, me?.id, socket]);
 
   // Показать кнопку «вниз», когда пользователь отмотал ленту вверх.
   const onScroll = () => {

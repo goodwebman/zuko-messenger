@@ -3,19 +3,22 @@ export {
   setConnected,
   setActiveConversation,
   setTyping,
-  incrementUnread,
-  clearUnread,
-  setUnreadMap,
   setPresence,
 } from './model/slice';
 export type { ChatState } from './model/slice';
 export {
   selectConnected,
   selectActiveConversation,
-  selectTotalUnread,
-  selectUnread,
   selectPresence,
   selectTyping,
 } from './model/selectors';
-export { useConversationsSuspense, fetchConversations } from './api/get-conversations';
+export { useConversationsSuspense, useTotalUnread, fetchConversations } from './api/get-conversations';
+export {
+  appendMessageToCache,
+  applyIncomingToConversations,
+  bumpConversationUnread,
+  clearConversationUnread,
+  applyReadReceipt,
+  totalUnread,
+} from './lib/conversation-cache';
 export { ConversationItem } from './ui/conversation-item';

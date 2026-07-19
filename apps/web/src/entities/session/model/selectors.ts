@@ -1,5 +1,8 @@
-import type { RootState } from '@/app/store';
+import type { SessionState } from './slice';
 
-export const selectCurrentUser = (state: RootState) => state.session.user;
-export const selectIsAuthed = (state: RootState) => Boolean(state.session.user);
-export const selectSessionInitialized = (state: RootState) => state.session.initialized;
+// Типизация по срезу, а не по RootState — entity не должен импортить app-слой (FSD: только вниз).
+type SessionSlice = { session: SessionState };
+
+export const selectCurrentUser = (state: SessionSlice) => state.session.user;
+export const selectIsAuthed = (state: SessionSlice) => Boolean(state.session.user);
+export const selectSessionInitialized = (state: SessionSlice) => state.session.initialized;

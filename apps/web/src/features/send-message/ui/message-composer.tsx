@@ -9,12 +9,25 @@ import type { ConversationSocketApi } from '../model/use-conversation-socket';
 export function MessageComposer({ socket }: { socket: ConversationSocketApi }) {
   const [body, setBody] = useState('');
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTypingSent = useRef(0);
+
+  const stopTyping = () => {
+    if (typingTimer.current) clearTimeout(typingTimer.current);
+    typingTimer.current = null;
+    lastTypingSent.current = 0;
+    socket.stopTyping();
+  };
 
   const onType = (value: string) => {
     setBody(value);
-    socket.startTyping();
+    // Троттлим typing:start — не на каждый символ, а раз в 2с, пока идёт набор.
+    const now = Date.now();
+    if (now - lastTypingSent.current > 2000) {
+      socket.startTyping();
+      lastTypingSent.current = now;
+    }
     if (typingTimer.current) clearTimeout(typingTimer.current);
-    typingTimer.current = setTimeout(socket.stopTyping, 1500);
+    typingTimer.current = setTimeout(stopTyping, 1500);
   };
 
   const submit = () => {
@@ -22,7 +35,7 @@ export function MessageComposer({ socket }: { socket: ConversationSocketApi }) {
     if (!parsed.success) return;
     socket.send(parsed.data.body);
     setBody('');
-    socket.stopTyping();
+    stopTyping();
   };
 
   return (

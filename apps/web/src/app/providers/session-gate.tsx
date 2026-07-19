@@ -21,13 +21,12 @@ export function SessionGate({ children }: { children: ReactNode }) {
     staleTime: Infinity,
   });
 
+  // Единый синк результата /auth/me в Redux (сессию читают синхронно socket и множество
+  // компонентов). Один эффект вместо двух — нет гонки порядка и лишнего кадра рассинхрона.
   useEffect(() => {
     if (isSuccess) dispatch(setUser(data));
-  }, [isSuccess, data, dispatch]);
-
-  useEffect(() => {
-    if (isError) dispatch(clearUser());
-  }, [isError, dispatch]);
+    else if (isError) dispatch(clearUser());
+  }, [isSuccess, isError, data, dispatch]);
 
   if (!initialized) {
     return (

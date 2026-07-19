@@ -1,31 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import {
   chatReducer,
-  incrementUnread,
   setActiveConversation,
+  setConnected,
   setPresence,
   setTyping,
-  setUnreadMap,
 } from './slice';
 
 const initial = chatReducer(undefined, { type: '@@INIT' });
 
 describe('chatSlice', () => {
-  it('incrementUnread повышает счётчик неактивного диалога', () => {
-    const state = chatReducer(initial, incrementUnread('c1'));
-    expect(state.unread.c1).toBe(1);
+  it('setConnected переключает флаг соединения', () => {
+    const state = chatReducer(initial, setConnected(true));
+    expect(state.connected).toBe(true);
   });
 
-  it('incrementUnread игнорирует активный диалог', () => {
-    const active = chatReducer(initial, setActiveConversation('c1'));
-    const state = chatReducer(active, incrementUnread('c1'));
-    expect(state.unread.c1).toBe(0);
-  });
-
-  it('setActiveConversation обнуляет непрочитанные', () => {
-    const withUnread = chatReducer(initial, setUnreadMap({ c1: 5 }));
-    const state = chatReducer(withUnread, setActiveConversation('c1'));
-    expect(state.unread.c1).toBe(0);
+  it('setActiveConversation запоминает активный диалог', () => {
+    const state = chatReducer(initial, setActiveConversation('c1'));
     expect(state.activeConversationId).toBe('c1');
   });
 

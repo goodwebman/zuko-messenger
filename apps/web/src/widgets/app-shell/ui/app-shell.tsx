@@ -6,7 +6,7 @@ import type { ComponentType, ReactNode, SVGProps } from 'react';
 import { UIBadge, buttonVariants, cn } from '@zuko/ui';
 import { UserAvatar } from '@/entities/user';
 import { selectCurrentUser } from '@/entities/session';
-import { selectTotalUnread } from '@/entities/conversation';
+import { useTotalUnread } from '@/entities/conversation';
 import { useNotificationsBadge } from '@/entities/notification';
 import { LogoutButton } from '@/features/auth';
 import {
@@ -100,7 +100,7 @@ function MobileNav({ items, pathname }: { items: NavItem[]; pathname: string }) 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const user = useAppSelector(selectCurrentUser);
-  const totalUnread = useAppSelector(selectTotalUnread);
+  const totalUnread = useTotalUnread(Boolean(user));
   const { data: notifications } = useNotificationsBadge(Boolean(user));
 
   // Гостю показываем только ленту: остальные разделы всё равно упрутся в middleware.
