@@ -11,7 +11,7 @@ import {
 } from '@/entities/conversation';
 import { selectCurrentUser } from '@/entities/session';
 import { useConversationSocket, MessageComposer } from '@/features/send-message';
-import { PageHeader } from '@/shared/ui';
+import { PageHeader } from '@zuko/ui/app';
 import { useAppSelector, isSameDay, formatDayLabel } from '@/shared/lib';
 
 export function Chat({ conversationId }: { conversationId: string }) {
@@ -92,7 +92,7 @@ export function Chat({ conversationId }: { conversationId: string }) {
             <Fragment key={message.id}>
               {showDay && (
                 <div className="sticky top-1 z-10 my-1.5 flex justify-center">
-                  <span className="glass rounded-full border border-border/60 px-3 py-1 text-[11px] font-medium text-cloud-text shadow-e1">
+                  <span className="glass rounded-full border border-border/60 px-3.5 py-1.5 text-xs font-medium text-cloud-text shadow-e1">
                     {formatDayLabel(message.createdAt)}
                   </span>
                 </div>
@@ -112,13 +112,13 @@ export function Chat({ conversationId }: { conversationId: string }) {
         aria-hidden={!showJump}
         tabIndex={showJump ? 0 : -1}
         className={cn(
-          'press glass-deep absolute bottom-20 right-4 z-20 flex size-10 items-center justify-center',
+          'press glass-deep absolute bottom-24 right-4 z-20 flex size-11 items-center justify-center',
           'rounded-full border border-border text-cloud-text shadow-e3',
           'transition-all duration-(--dur-base) ease-smooth',
           showJump ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0',
         )}
       >
-        <ChevronDown className="size-5" />
+        <ChevronDown className="size-6" />
       </button>
 
       <MessageComposer socket={socket} />

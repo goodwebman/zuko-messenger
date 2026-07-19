@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { UIButton, UITextarea } from '@zuko/ui';
 import { sendMessageSchema } from '@zuko/contracts';
+import { SendIcon } from '@zuko/ui/app';
 import type { ConversationSocketApi } from '../model/use-conversation-socket';
 
 export function MessageComposer({ socket }: { socket: ConversationSocketApi }) {
@@ -37,7 +38,7 @@ export function MessageComposer({ socket }: { socket: ConversationSocketApi }) {
         }}
         placeholder="Сообщение…"
         rows={1}
-        className="max-h-32 min-h-10 resize-none rounded-2xl focus-visible:shadow-(--glow-accent)"
+        className="max-h-32 min-h-11 resize-none rounded-2xl focus-visible:shadow-(--glow-accent)"
         maxLength={4000}
         aria-label="Текст сообщения"
       />
@@ -45,10 +46,10 @@ export function MessageComposer({ socket }: { socket: ConversationSocketApi }) {
         onClick={submit}
         disabled={body.trim().length === 0}
         size="icon"
-        className="shrink-0 rounded-full text-lg"
+        className="press shrink-0 rounded-full"
         aria-label="Отправить"
       >
-        →
+        <SendIcon className="size-5.5" />
       </UIButton>
     </div>
   );

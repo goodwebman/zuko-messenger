@@ -7,7 +7,7 @@ export function CommentItem({ comment }: { comment: Comment }) {
   return (
     <div className="flex gap-3 border-b border-steel-border px-4 py-3">
       <Link href={`/profile/${comment.author.username}`}>
-        <UserAvatar user={comment.author} className="size-8" />
+        <UserAvatar user={comment.author} />
       </Link>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 text-sm">
@@ -16,7 +16,7 @@ export function CommentItem({ comment }: { comment: Comment }) {
           <span className="text-fog-text">·</span>
           <span className="text-fog-text">{timeAgo(comment.createdAt)}</span>
         </div>
-        <p className="mt-0.5 whitespace-pre-wrap text-sm text-cloud-text">{comment.body}</p>
+        <p className="mt-0.5 whitespace-pre-wrap text-base text-cloud-text">{comment.body}</p>
       </div>
     </div>
   );

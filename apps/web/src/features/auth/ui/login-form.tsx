@@ -1,16 +1,18 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, type LoginInput } from '@zuko/contracts';
-import { UIButton, UICard, UIInput, UILabel } from '@zuko/ui';
+import { UIButton, UIInput } from '@zuko/ui';
 import { ApiError } from '@/shared/api';
 import { useLogin } from '../model/use-auth';
+import { safeNext } from '../lib/safe-next';
+import { AuthCard, AuthField, AuthSwitch } from './auth-shell';
 
 export function LoginForm() {
   const router = useRouter();
+  const params = useSearchParams();
   const login = useLogin();
   const {
     register,
@@ -18,53 +20,52 @@ export function LoginForm() {
     formState: { errors },
   } = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
 
+  const next = safeNext(params.get('next'));
+
   const onSubmit = handleSubmit((values) => {
-    login.mutate(values, { onSuccess: () => router.replace('/feed') });
+    login.mutate(values, { onSuccess: () => router.replace(next) });
   });
 
   const serverError = login.error instanceof ApiError ? login.error.message : null;
 
   return (
-    <UICard>
-      <UICard.Header>
-        <UICard.Title>Вход</UICard.Title>
-        <UICard.Description>Рады видеть снова</UICard.Description>
-      </UICard.Header>
-      <form onSubmit={onSubmit}>
-        <UICard.Content className="space-y-4">
-          <div className="space-y-1.5">
-            <UILabel htmlFor="login">Username или email</UILabel>
-            <UIInput
-              id="login"
-              autoComplete="username"
-              error={errors.login?.message}
-              {...register('login')}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <UILabel htmlFor="password">Пароль</UILabel>
-            <UIInput
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              error={errors.password?.message}
-              {...register('password')}
-            />
-          </div>
-          {serverError && <p className="text-sm text-destructive">{serverError}</p>}
-        </UICard.Content>
-        <UICard.Footer className="flex-col items-stretch gap-3">
-          <UIButton type="submit" loading={login.isPending} className="w-full">
-            Войти
-          </UIButton>
-          <p className="text-center text-sm text-fog-text">
-            Нет аккаунта?{' '}
-            <Link href="/register" className="text-signal-lime hover:underline">
-              Регистрация
-            </Link>
+    <AuthCard title="Вход" description="Рады видеть снова">
+      <form onSubmit={onSubmit} className="space-y-5">
+        <AuthField id="login" label="Username или email">
+          <UIInput
+            id="login"
+            autoComplete="username"
+            error={errors.login?.message}
+            {...register('login')}
+          />
+        </AuthField>
+
+        <AuthField id="password" label="Пароль">
+          <UIInput
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            error={errors.password?.message}
+            {...register('password')}
+          />
+        </AuthField>
+
+        {serverError && (
+          <p role="alert" className="text-sm text-destructive">
+            {serverError}
           </p>
-        </UICard.Footer>
+        )}
+
+        <UIButton type="submit" size="lg" loading={login.isPending} className="press w-full">
+          Войти
+        </UIButton>
+
+        <AuthSwitch
+          question="Нет аккаунта?"
+          href={`/register?next=${encodeURIComponent(next)}`}
+          action="Регистрация"
+        />
       </form>
-    </UICard>
+    </AuthCard>
   );
 }

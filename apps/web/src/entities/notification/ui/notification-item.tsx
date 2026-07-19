@@ -14,8 +14,8 @@ export function NotificationItem({ notification }: { notification: Notification 
         !notification.read && 'bg-accent/30',
       )}
     >
-      <UserAvatar user={notification.actor} className="size-8" />
-      <p className="min-w-0 flex-1 text-sm text-cloud-text">
+      <UserAvatar user={notification.actor} />
+      <p className="min-w-0 flex-1 text-base text-cloud-text">
         <span className="text-bone-text">{notification.actor.displayName}</span>{' '}
         {notificationLabel(notification)}
       </p>

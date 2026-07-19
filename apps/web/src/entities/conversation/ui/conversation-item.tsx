@@ -25,17 +25,17 @@ export function ConversationItem({ conversation, unreadCount, online }: Conversa
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <span className="truncate text-sm text-bone-text">{peer.displayName}</span>
+          <span className="truncate text-base text-bone-text">{peer.displayName}</span>
           {lastMessage && (
             <span className="shrink-0 text-xs text-fog-text">{timeAgo(lastMessage.createdAt)}</span>
           )}
         </div>
-        <p className={cn('truncate text-sm', unreadCount > 0 ? 'text-cloud-text' : 'text-fog-text')}>
+        <p className={cn('truncate text-base', unreadCount > 0 ? 'text-cloud-text' : 'text-fog-text')}>
           {lastMessage?.body ?? 'Нет сообщений'}
         </p>
       </div>
       {unreadCount > 0 && (
-        <span className="flex size-5 animate-pop items-center justify-center rounded-full bg-signal-lime text-xs font-medium text-ink-well shadow-e1">
+        <span className="flex size-6 animate-pop items-center justify-center rounded-full bg-signal-lime text-xs font-medium text-ink-well shadow-e1">
           {unreadCount > 9 ? '9+' : unreadCount}
         </span>
       )}

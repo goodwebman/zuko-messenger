@@ -9,7 +9,7 @@ interface UserAvatarProps {
 
 export function UserAvatar({ user, className }: UserAvatarProps) {
   return (
-    <UIAvatar className={cn('size-9', className)}>
+    <UIAvatar className={cn('size-11', className)}>
       {user.avatarUrl && <UIAvatar.Image src={user.avatarUrl} alt={user.displayName} />}
       <UIAvatar.Fallback>{initials(user.displayName)}</UIAvatar.Fallback>
     </UIAvatar>

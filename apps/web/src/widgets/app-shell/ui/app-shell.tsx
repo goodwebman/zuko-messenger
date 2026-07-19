@@ -3,15 +3,21 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ComponentType, ReactNode, SVGProps } from 'react';
-import { UIBadge, cn } from '@zuko/ui';
+import { UIBadge, buttonVariants, cn } from '@zuko/ui';
 import { UserAvatar } from '@/entities/user';
 import { selectCurrentUser } from '@/entities/session';
 import { selectTotalUnread } from '@/entities/conversation';
 import { useNotificationsBadge } from '@/entities/notification';
-import { useLogout } from '@/features/auth';
-import { BrandLogo } from '@/shared/ui';
+import { LogoutButton } from '@/features/auth';
+import {
+  BellIcon,
+  BrandLogo,
+  HomeIcon,
+  MessageIcon,
+  SettingsIcon,
+  UserIcon,
+} from '@zuko/ui/app';
 import { useAppSelector } from '@/shared/lib';
-import { BellIcon, HomeIcon, MessageIcon, SettingsIcon, UserIcon } from './nav-icons';
 
 interface NavItem {
   href: string;
@@ -31,7 +37,7 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
       href={item.href}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'press relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm',
+        'press relative flex items-center gap-3 rounded-lg px-3 py-3 text-base',
         active
           ? 'bg-accent text-bone-text shadow-e1'
           : 'text-cloud-text hover:bg-accent/60 hover:text-bone-text',
@@ -43,7 +49,7 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
           className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-signal-lime"
         />
       )}
-      <ItemIcon />
+      <ItemIcon className="size-6" />
       <span className="flex-1">{item.label}</span>
       {item.badge ? (
         <UIBadge variant="default" className="min-w-5 animate-pop justify-center">
@@ -71,14 +77,14 @@ function MobileNav({ items, pathname }: { items: NavItem[]; pathname: string }) 
             aria-current={active ? 'page' : undefined}
             aria-label={item.label}
             className={cn(
-              'press relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px]',
+              'press relative flex flex-1 flex-col items-center gap-1 py-3 text-xs',
               active ? 'text-signal-lime' : 'text-fog-text',
             )}
           >
             <span className="relative">
-              <ItemIcon />
+              <ItemIcon className="size-7" />
               {item.badge ? (
-                <span className="absolute -right-2 -top-1 flex h-4 min-w-4 animate-pop items-center justify-center rounded-full bg-signal-lime px-1 text-[9px] font-semibold text-ink-well">
+                <span className="absolute -right-2 -top-1 flex h-5 min-w-5 animate-pop items-center justify-center rounded-full bg-signal-lime px-1 text-[11px] font-semibold text-ink-well">
                   {item.badge > 99 ? '99+' : item.badge}
                 </span>
               ) : null}
@@ -96,20 +102,32 @@ export function AppShell({ children }: { children: ReactNode }) {
   const user = useAppSelector(selectCurrentUser);
   const totalUnread = useAppSelector(selectTotalUnread);
   const { data: notifications } = useNotificationsBadge(Boolean(user));
-  const logout = useLogout();
 
-  const items: NavItem[] = [
-    { href: '/feed', label: 'Лента', icon: HomeIcon },
-    { href: '/messages', label: 'Сообщения', icon: MessageIcon, badge: totalUnread },
-    { href: '/notifications', label: 'Уведомления', icon: BellIcon, badge: notifications?.unread },
-    { href: user ? `/profile/${user.username}` : '/feed', label: 'Профиль', icon: UserIcon },
-    { href: '/settings', label: 'Настройки', icon: SettingsIcon },
-  ];
+  // Гостю показываем только ленту: остальные разделы всё равно упрутся в middleware.
+  const items: NavItem[] = user
+    ? [
+        { href: '/feed', label: 'Лента', icon: HomeIcon },
+        { href: '/messages', label: 'Сообщения', icon: MessageIcon, badge: totalUnread },
+        {
+          href: '/notifications',
+          label: 'Уведомления',
+          icon: BellIcon,
+          badge: notifications?.unread,
+        },
+        { href: `/profile/${user.username}`, label: 'Профиль', icon: UserIcon },
+        { href: '/settings', label: 'Настройки', icon: SettingsIcon },
+      ]
+    : [{ href: '/feed', label: 'Лента', icon: HomeIcon }];
+
+  // На мобилке нет сайдбара с CTA — вход выносим прямо в нижнюю навигацию.
+  const mobileItems: NavItem[] = user
+    ? items
+    : [...items, { href: '/login', label: 'Войти', icon: UserIcon }];
 
   return (
     <div className="flex min-h-dvh w-full">
       {/* Сайдбар прижат к левому углу (без центрирующего mx-auto), скрыт на мобилке. */}
-      <aside className="glass-deep sticky top-0 hidden h-dvh w-60 shrink-0 flex-col border-r border-steel-border p-4 md:flex">
+      <aside className="glass-deep sticky top-0 hidden h-dvh w-68 shrink-0 flex-col border-r border-steel-border p-4 md:flex">
         <div className="px-2 py-3">
           <BrandLogo />
         </div>
@@ -118,32 +136,39 @@ export function AppShell({ children }: { children: ReactNode }) {
             <NavLink key={item.href} item={item} active={isActive(pathname, item.href)} />
           ))}
         </nav>
-        {user && (
+        {user ? (
           <div className="mt-4 flex items-center gap-3 border-t border-steel-border pt-4">
-            <UserAvatar user={user} className="size-9" />
+            <UserAvatar user={user} />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm text-bone-text">{user.displayName}</p>
-              <p className="truncate text-xs text-fog-text">@{user.username}</p>
+              <p className="truncate text-base text-bone-text">{user.displayName}</p>
+              <p className="truncate text-sm text-fog-text">@{user.username}</p>
             </div>
-            <button
-              type="button"
-              onClick={() => logout.mutate()}
-              title="Выйти"
-              aria-label="Выйти"
-              className="press rounded-lg px-2 py-1 text-cloud-text hover:bg-accent hover:text-bone-text"
+            <LogoutButton />
+          </div>
+        ) : (
+          <div className="mt-4 flex flex-col gap-2.5 border-t border-steel-border pt-4">
+            <p className="px-1 text-sm leading-relaxed text-fog-text">
+              Вы читаете как гость. Войдите, чтобы писать посты и отвечать.
+            </p>
+            <Link href="/login" className={cn(buttonVariants(), 'press w-full')}>
+              Войти
+            </Link>
+            <Link
+              href="/register"
+              className={cn(buttonVariants({ variant: 'ghost' }), 'w-full')}
             >
-              ⎋
-            </button>
+              Создать аккаунт
+            </Link>
           </div>
         )}
       </aside>
 
       {/* Контент на всю ширину области; снизу отступ под мобильный bottom-nav. */}
-      <main className="min-w-0 flex-1 pb-16 md:pb-0">
+      <main className="min-w-0 flex-1 pb-20 md:pb-0">
         <div className="w-full">{children}</div>
       </main>
 
-      <MobileNav items={items} pathname={pathname} />
+      <MobileNav items={mobileItems} pathname={pathname} />
     </div>
   );
 }

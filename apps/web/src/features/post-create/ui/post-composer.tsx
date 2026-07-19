@@ -1,9 +1,10 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { UIButton, UITextarea, cn } from '@zuko/ui';
+import { UIButton, cn } from '@zuko/ui';
 import { MAX_POST_IMAGES, type Me } from '@zuko/contracts';
 import { UserAvatar } from '@/entities/user';
+import { AutoTextarea, CloseIcon, ImageIcon } from '@zuko/ui/app';
 import { useCreatePost } from '../model/use-create-post';
 import { useUploadImages } from '../model/use-upload-images';
 
@@ -50,103 +51,111 @@ export function PostComposer({ user }: { user: Me }) {
     createPost.mutate({ body: body.trim(), images }, { onSuccess: reset });
   };
 
-  return (
-    <div className="flex gap-3 border-b border-steel-border px-4 py-4">
-      <UserAvatar user={user} />
-      <div className="min-w-0 flex-1">
-        <UITextarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder="Что нового?"
-          rows={2}
-          className="resize-none border-0 bg-transparent px-0 focus-visible:ring-0"
-          maxLength={2000}
-        />
+  const full = drafts.length >= MAX_POST_IMAGES;
 
-        {drafts.length > 0 && (
-          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {drafts.map((d) => (
-              <div
-                key={d.url}
-                className="ring-hairline group relative aspect-square overflow-hidden rounded-xl"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={d.url} alt="" className="size-full object-cover" />
+  return (
+    <div className="border-b border-steel-border px-4 py-4">
+      <div
+        className={cn(
+          'rounded-2xl border border-steel-border bg-card/60 p-3 shadow-e1',
+          'transition-[border-color,box-shadow] duration-(--dur-base) ease-smooth',
+          'focus-within:border-graphite-hairline focus-within:shadow-e2',
+        )}
+      >
+        <div className="flex gap-3">
+          <UserAvatar user={user} />
+
+          <div className="min-w-0 flex-1">
+            <AutoTextarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder="Что нового?"
+              maxLength={2000}
+              aria-label="Текст поста"
+              className="py-2 text-base"
+            />
+
+            {drafts.length > 0 && (
+              <div className="mt-3 grid max-w-90 grid-cols-4 gap-2">
+                {drafts.map((d) => (
+                  <div
+                    key={d.url}
+                    className="relative aspect-square overflow-hidden rounded-lg border border-steel-border"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={d.url} alt="" className="size-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeDraft(d.url)}
+                      aria-label="Убрать фото"
+                      className="press absolute right-1 top-1 flex size-7 items-center justify-center rounded-full bg-ink-well/85 text-bone-text backdrop-blur transition hover:bg-ink-well"
+                    >
+                      <CloseIcon className="size-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {upload.isError && (
+              <p role="alert" className="mt-2 text-xs text-destructive">
+                {upload.error instanceof Error ? upload.error.message : 'Не удалось загрузить фото'}
+              </p>
+            )}
+
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              onChange={(e) => addFiles(e.target.files)}
+            />
+
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-steel-border pt-3">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => removeDraft(d.url)}
-                  aria-label="Убрать фото"
-                  className="press absolute right-1 top-1 flex size-6 items-center justify-center rounded-full bg-ink-well/80 text-bone-text backdrop-blur transition hover:bg-ink-well"
+                  onClick={() => inputRef.current?.click()}
+                  disabled={full || pending}
+                  aria-label="Прикрепить фото"
+                  title={full ? `Максимум ${MAX_POST_IMAGES} фото` : 'Прикрепить фото'}
+                  className={cn(
+                    'press flex items-center justify-center rounded-lg p-2 text-signal-lime transition-colors hover:bg-accent',
+                    (full || pending) && 'cursor-not-allowed opacity-40 hover:bg-transparent',
+                  )}
                 >
-                  <svg
-                    width={14}
-                    height={14}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    aria-hidden
-                  >
-                    <path d="M18 6 6 18M6 6l12 12" />
-                  </svg>
+                  <ImageIcon className="size-6" />
                 </button>
+                {drafts.length > 0 && (
+                  <span className="text-xs tabular-nums text-fog-text">
+                    {drafts.length}/{MAX_POST_IMAGES}
+                  </span>
+                )}
               </div>
-            ))}
+
+              <div className="flex items-center gap-3">
+                {body.length >= 1800 && (
+                  <span
+                    className={cn(
+                      'text-xs tabular-nums',
+                      body.length >= 2000 ? 'font-medium text-destructive' : 'text-fog-text',
+                    )}
+                  >
+                    {body.length}/2000
+                  </span>
+                )}
+                <UIButton
+                  className="press rounded-full px-5"
+                  disabled={!canPost}
+                  loading={pending}
+                  onClick={submit}
+                >
+                  Опубликовать
+                </UIButton>
+              </div>
+            </div>
           </div>
-        )}
-
-        {upload.isError && (
-          <p className="mt-2 text-xs text-destructive">
-            {upload.error instanceof Error ? upload.error.message : 'Не удалось загрузить фото'}
-          </p>
-        )}
-
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          multiple
-          hidden
-          onChange={(e) => addFiles(e.target.files)}
-        />
-
-        <div className="mt-2 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
-              disabled={drafts.length >= MAX_POST_IMAGES || pending}
-              aria-label="Прикрепить фото"
-              title={
-                drafts.length >= MAX_POST_IMAGES ? `Максимум ${MAX_POST_IMAGES} фото` : 'Прикрепить фото'
-              }
-              className={cn(
-                'press flex items-center justify-center rounded-lg p-1.5 text-signal-lime transition hover:bg-accent',
-                (drafts.length >= MAX_POST_IMAGES || pending) && 'cursor-not-allowed opacity-40',
-              )}
-            >
-              <svg
-                width={20}
-                height={20}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="9" cy="9" r="2" />
-                <path d="m21 15-3.6-3.6a2 2 0 0 0-2.8 0L6 20" />
-              </svg>
-            </button>
-            <span className="text-xs text-fog-text">{body.length}/2000</span>
-          </div>
-          <UIButton size="sm" disabled={!canPost} loading={pending} onClick={submit}>
-            Опубликовать
-          </UIButton>
         </div>
       </div>
     </div>
