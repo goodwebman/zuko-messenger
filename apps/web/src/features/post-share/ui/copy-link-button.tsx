@@ -1,6 +1,8 @@
 'use client';
 
-import { UIButton, useToast } from '@zuko/ui';
+import { useToast } from '@zuko/ui';
+import { cn } from '@zuko/ui';
+import { LinkIcon, actionItemIcon, actionItemVariants } from '@zuko/ui/app';
 
 export function CopyLinkButton({ postId }: { postId: string }) {
   const { addToast } = useToast();
@@ -15,8 +17,14 @@ export function CopyLinkButton({ postId }: { postId: string }) {
   };
 
   return (
-    <UIButton variant="ghost" size="sm" onClick={copy} className="ml-auto">
-      Ссылка
-    </UIButton>
+    <button
+      type="button"
+      onClick={copy}
+      aria-label="Скопировать ссылку"
+      title="Скопировать ссылку"
+      className={cn(actionItemVariants(), 'ml-auto')}
+    >
+      <LinkIcon className={actionItemIcon} />
+    </button>
   );
 }

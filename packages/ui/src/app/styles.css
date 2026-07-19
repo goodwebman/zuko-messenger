@@ -1,0 +1,55 @@
+/* ============================================================
+   CSS прикладного слоя (@zuko/ui/app).
+
+   Разделение с styles/tokens.css: там — дизайн-токены и утилиты, годные
+   для любого проекта на этом ките; здесь — то, что существует ради zuko
+   (кейфреймы конкретных эффектов, правки Preflight под наш интерфейс).
+
+   Подключается из apps/web/src/app/globals.css после @zuko/ui/styles.css.
+   ============================================================ */
+
+@theme {
+  --animate-burst: ui-burst 0.62s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-burst-ring: ui-burst-ring 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Tailwind v4 в Preflight сбросил кнопкам `cursor: pointer` на `default`
+   (в v3 он был). Возвращаем: без него интерактив не читается как кликабельный.
+   `:not(:disabled)` — заблокированные элементы должны оставаться «мёртвыми». */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary,
+  label[for] {
+    cursor: pointer;
+  }
+}
+
+/* Частица «конфети»: разлёт по вектору --burst-x/--burst-y, заданному инлайном
+   на самой частице. var() внутри keyframes резолвится один раз в computed value,
+   поэтому анимируется только сам transform — перерасчёта стилей на кадр нет. */
+@keyframes ui-burst {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.3) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--burst-x), var(--burst-y), 0) scale(0) rotate(var(--burst-spin));
+    opacity: 0;
+  }
+}
+
+/* Ударная волна под частицами — читается как «нажатие сработало». */
+@keyframes ui-burst-ring {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}

@@ -8,16 +8,18 @@ import { LikeButton } from '@/features/post-like';
 import { RepostButton } from '@/features/post-repost';
 import { DeletePostButton } from '@/features/post-delete';
 import { CopyLinkButton } from '@/features/post-share';
+import { CommentIcon, actionItemIcon, actionItemVariants } from '@zuko/ui/app';
 import { useAppSelector } from '@/shared/lib';
 
 function CommentLink({ post }: { post: Post }) {
   return (
     <Link
       href={`/post/${post.id}`}
-      className="flex items-center gap-1.5 rounded-md px-2 py-1 text-fog-text transition-colors hover:bg-accent"
+      className={actionItemVariants()}
       aria-label="Комментарии"
+      title="Комментарии"
     >
-      <span aria-hidden>💬</span>
+      <CommentIcon className={actionItemIcon} />
       {post.commentCount > 0 && post.commentCount}
     </Link>
   );
@@ -33,7 +35,7 @@ export function PostCardConnected({ post }: { post: Post }) {
       post={post}
       headerSlot={isOwn ? <DeletePostButton postId={post.id} /> : undefined}
       actions={
-        <div className="flex items-center gap-1 text-sm text-fog-text">
+        <div className="flex items-center gap-1 text-base text-fog-text">
           <LikeButton post={post} />
           <CommentLink post={post} />
           <RepostButton post={post} />
