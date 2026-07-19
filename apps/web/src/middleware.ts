@@ -1,7 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 const AUTH_PAGES = ['/login', '/register'];
-const PROTECTED = ['/feed', '/messages', '/post', '/profile', '/settings', '/notifications'];
+/**
+ * Лента, посты и профили открыты гостю на чтение — писать он всё равно не сможет
+ * (API отдаёт 401 на мутации). Приватное — личные разделы.
+ */
+const PROTECTED = ['/messages', '/settings', '/notifications'];
 
 /**
  * Гейтинг по наличию refresh-cookie (zuko_rt). Валидность проверяет API —
@@ -17,11 +21,15 @@ export function middleware(req: NextRequest) {
   if (isProtected && !hasSession) {
     const url = req.nextUrl.clone();
     url.pathname = '/login';
+    url.search = '';
+    // Куда вернуть после входа — только внутренний путь, чтобы не открыть open redirect.
+    url.searchParams.set('next', `${pathname}${req.nextUrl.search}`);
     return NextResponse.redirect(url);
   }
   if (isAuthPage && hasSession) {
     const url = req.nextUrl.clone();
     url.pathname = '/feed';
+    url.search = '';
     return NextResponse.redirect(url);
   }
   return NextResponse.next();

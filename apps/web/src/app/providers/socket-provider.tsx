@@ -38,7 +38,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     const onNotificationNew = (n: Notification) => {
       void qc.invalidateQueries({ queryKey: queryKeys.notifications });
       if (n.type === 'MESSAGE' && n.conversationId) dispatch(incrementUnread(n.conversationId));
-      addToast(notificationToast(n), n.type === 'MESSAGE' ? 'info' : 'default');
+      addToast(notificationToast(n), 'default');
     };
 
     const onTyping = (p: { conversationId: string; userId: string; typing: boolean }) =>

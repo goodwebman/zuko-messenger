@@ -5,3 +5,5 @@ export {
   selectIsAuthed,
   selectSessionInitialized,
 } from './model/selectors';
+export { useAuthGate } from './model/use-auth-gate';
+export type { AuthGate } from './model/use-auth-gate';

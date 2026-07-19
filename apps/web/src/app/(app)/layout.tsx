@@ -1,20 +1,18 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import type { ReactNode } from 'react';
 import { AppShell } from '@/widgets/app-shell';
-import { selectCurrentUser, selectSessionInitialized } from '@/entities/session';
+import { selectSessionInitialized } from '@/entities/session';
 import { useAppSelector } from '@/shared/lib';
 
+/**
+ * Гостя не выкидываем: лента, посты и профили открыты на чтение, приватные
+ * разделы отсекает middleware по refresh-cookie. Ждём только инициализации
+ * сессии — иначе шелл на кадр мигнёт гостевым состоянием у залогиненного.
+ */
 export default function AppLayout({ children }: { children: ReactNode }) {
-  const router = useRouter();
-  const user = useAppSelector(selectCurrentUser);
   const initialized = useAppSelector(selectSessionInitialized);
 
-  useEffect(() => {
-    if (initialized && !user) router.replace('/login');
-  }, [initialized, user, router]);
-
-  if (!user) return null;
+  if (!initialized) return null;
   return <AppShell>{children}</AppShell>;
 }
